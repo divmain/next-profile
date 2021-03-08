@@ -13,6 +13,7 @@
     "vite-serve": "vite preview"
   },
   "dependencies": {
+    "cli-progress": "^3.9.0",
     "eventsource": "^1.0.7",
     "next": "10.0.8",
     "node-fetch": "^2.6.1",

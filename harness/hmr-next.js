@@ -4,6 +4,7 @@ const {
   median,
   sampleStandardDeviation,
 } = require('simple-statistics')
+const cliProgress = require('cli-progress')
 
 const {
   sleep,
@@ -99,9 +100,12 @@ const getMeasurements = async () => {
 
   const hmrMeasurements = []
 
+  const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+  progressBar.start(MAX_DEPTH * ITERATIONS, 0);
+
   for (let depth = 0; depth < MAX_DEPTH; depth++) {
-    console.log(`hmr depth ${depth}...`)
-    for (let iteration = 1;iteration < ITERATIONS;  iteration++) {
+    for (let iteration = 1; iteration < ITERATIONS; iteration++) {
+      progressBar.update(depth * ITERATIONS + iteration)
       const triggerHmr = await prepForHmr(depth)
 
       const measureHmr = measure()
@@ -119,6 +123,8 @@ const getMeasurements = async () => {
       })
     }
   }
+
+  progressBar.stop();
 
   console.log('terminating next...')
   const exit = onExit()
