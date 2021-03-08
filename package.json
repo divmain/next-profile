@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "gen-components": "fuzzponent --depth 4 --seed 1337 --outdir components --minChild 2 --maxChild 5 --extension tsx",
+    "measure-next-hmr": "rm -fr .next && node harness/hmr-next.js",
     "next-dev": "next",
     "next-build": "next build",
     "next-start": "next start",
@@ -12,9 +13,12 @@
     "vite-serve": "vite preview"
   },
   "dependencies": {
+    "eventsource": "^1.0.7",
     "next": "latest",
+    "node-fetch": "^2.6.1",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "simple-statistics": "^7.6.0"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
