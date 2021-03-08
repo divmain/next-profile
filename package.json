@@ -2,7 +2,7 @@
   "name": "fefw-perf",
   "version": "1.0.0",
   "scripts": {
-    "gen-components": "fuzzponent --depth 4 --seed 1337 --outdir components --minChild 2 --maxChild 5",
+    "gen-components": "fuzzponent --depth 4 --seed 1337 --outdir components --minChild 2 --maxChild 5 --extension tsx",
     "next-dev": "next",
     "next-build": "next build",
     "next-start": "next start",

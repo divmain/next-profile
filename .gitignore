@@ -35,3 +35,4 @@ dist
 dist-ssr
 
 /components/
+/next-env.d.ts
