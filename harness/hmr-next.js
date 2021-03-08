@@ -100,7 +100,9 @@ const getMeasurements = async () => {
 
   const hmrMeasurements = []
 
-  const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+  const progressBar = new cliProgress.SingleBar({
+    format: 'HMR Iterations | {bar} | {percentage}% | {eta_formatted}'
+  }, cliProgress.Presets.shades_classic);
   progressBar.start(MAX_DEPTH * ITERATIONS, 0);
 
   for (let depth = 0; depth < MAX_DEPTH; depth++) {
