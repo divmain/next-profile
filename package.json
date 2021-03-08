@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "eventsource": "^1.0.7",
-    "next": "latest",
+    "next": "10.0.8",
     "node-fetch": "^2.6.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
