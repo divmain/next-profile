@@ -1,12 +1,9 @@
-const { promises: { readFile, writeFile } } = require('fs')
-const {
-  mean,
-  median,
-  sampleStandardDeviation,
-} = require('simple-statistics')
-const cliProgress = require('cli-progress')
+import { promises as fsPromises } from 'fs'
+import { mean, median, sampleStandardDeviation } from 'simple-statistics'
+import cliProgress from 'cli-progress'
+const { readFile, writeFile } = fsPromises
 
-const {
+import {
   sleep,
   exec,
   measure,
@@ -15,56 +12,51 @@ const {
   eventSource,
   range,
   formatMicroseconds,
-} = require('./util')
+  EventSourceHelper,
+} from './util'
 
 
+// TODO: make configurable
 const NEXT_URL = 'http://localhost:3000/'
+// TODO: make configurable
 const NEXT_HMR_URL = 'http://localhost:3000/_next/webpack-hmr?page=/'
+// TODO: remove the "depth" piece and only profile the page and file
+//       that is specified explicitly
 const MAX_DEPTH = 4
+// TODO: make configurable
 const ITERATIONS = 500
 const PAUSE_DURATION = 50 // milliseconds
 
+const INJECT_PRELUDE = '\n/*** NONCE:'
+const INJECT_POSTLUDE = ':NONCE ***/\n'
 
-const prepForHmr = async (depth = 0) => {
-  let componentFilename = 'components/index.tsx'
-  if (depth === 1) {
-    componentFilename = 'components/Dwikrdoythlgzcubmdblkuq.tsx'
-  } else if (depth === 2) {
-    componentFilename = 'components/Cadvgqnxutgljwmpjokj.tsx'
-  } else if (depth === 3) {
-    componentFilename = 'components/Qxpjuwpugdiqrzgfboyh.tsx'
-  } else if (depth === 4) {
-    componentFilename = 'components/Facekytlkmpcfgojenkmpr.tsx'
+const prepForHmr = async (sourceFilePath: string) => {
+  let content = await readFile(sourceFilePath, 'utf8')
+
+  const toInject = `${INJECT_PRELUDE}${randomString()}${INJECT_POSTLUDE}`
+  let injectStart = content.indexOf(INJECT_PRELUDE)
+  let injectEnd = content.indexOf(INJECT_POSTLUDE) + INJECT_POSTLUDE.length
+
+  if (injectStart === 1) {
+    injectStart = content.length
+    injectEnd = content.length
   }
 
-  let content = await readFile(componentFilename, 'utf8')
+  content = `${
+    content.slice(0, injectStart)
+  }${
+    toInject
+  }${
+    content.slice(injectEnd)
+  }`
 
-  const boldStart = content.indexOf('<b>')
-  const boldEnd = content.indexOf('</b>') + 4
-
-  if (boldStart === -1) {
-    const divEnd = content.indexOf('<div>') + 5
-    content = `${
-      content.slice(0, divEnd)
-    }<b>${
-      randomString()
-    }</b>${
-      content.slice(divEnd)
-    }`
-  } else {
-    content = `${
-      content.slice(0, boldStart)
-    }<b>${
-      randomString()
-    }</b>${
-      content.slice(boldEnd)
-    }`
-  }
-
-  return () => writeFile(componentFilename, content)
+  return () => writeFile(sourceFilePath, content)
 }
 
-const eventOfType = async (eventSource, eventType) => {
+const eventOfType = async (
+  eventSource: EventSourceHelper,
+  eventType: string,
+) => {
   while (true) {
     const { data } = await eventSource.nextEvent()
     if (data[0] === '{') {
@@ -140,7 +132,10 @@ const getMeasurements = async () => {
   }
 }
 
-const reportStats = (description, numbers = []) => {
+const reportStats = (
+  description: string,
+  numbers: number[] = [],
+) => {
   if (!numbers.length) { return }
 
   console.log(`${description}, mean: ${formatMicroseconds(mean(numbers))}`)
@@ -148,6 +143,8 @@ const reportStats = (description, numbers = []) => {
   console.log(`${description}, stddev: ${formatMicroseconds(sampleStandardDeviation(numbers))}`)
 }
 
+// TODO: abstract away the deleting of `.next`
+    // "measure-next-hmr": "rm -fr .next && node harness/hmr-next.js",
 const main = async () => {
   const { firstPageLoad, secondPageLoad, hmrMeasurements } = await getMeasurements()
 

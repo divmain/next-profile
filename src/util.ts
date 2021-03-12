@@ -1,19 +1,17 @@
-const { randomBytes } = require('crypto')
-const { promisify } = require('util')
-const { spawn } = require('child_process')
-const EventSource = require('eventsource')
+import { randomBytes } from 'crypto'
+import { promisify } from 'util'
+import { spawn } from 'child_process'
 
-const fetch = require('node-fetch')
+import EventSource from 'eventsource'
+import fetch, { Response, RequestInfo, RequestInit } from 'node-fetch'
 
 
-const sleep = promisify(setTimeout)
+export const sleep = promisify(setTimeout)
 
 const NANOSECONDS_IN_MICROSECOND = 1000n
-const FETCH_LOOP_SLEEP = 20 // ms
+export const FETCH_LOOP_SLEEP = 20 // ms
 
-const exec = cmd => {
-  const start = process.hrtime.bigint()
-
+export const exec = (cmd: string) => {
   const childProc = spawn(cmd, {
     shell: true,
     stdio: [
@@ -31,12 +29,15 @@ const exec = cmd => {
   }
 }
 
-const measure = () => {
+export const measure = () => {
   const start = process.hrtime.bigint()
   return () => Number((process.hrtime.bigint() - start) / NANOSECONDS_IN_MICROSECOND)
 }
 
-const nulledFetch = async (url, opts) => {
+const nulledFetch = async (
+  url: RequestInfo,
+  opts: RequestInit,
+): Promise<Response | null> => {
   try {
     return await fetch(url, opts)
   } catch (err) {
@@ -44,7 +45,10 @@ const nulledFetch = async (url, opts) => {
   }
 }
 
-const fetchUntilConnect = async (url, opts={}) => {
+export const fetchUntilConnect = async (
+  url: RequestInfo,
+  opts: RequestInit = {}
+): Promise<{ response: Response; retries: number }> => {
   let retries = 0
   while (true) {
     const nFetch = await nulledFetch(url, opts)
@@ -59,15 +63,21 @@ const fetchUntilConnect = async (url, opts={}) => {
   }
 }
 
-const randomString = () => randomBytes(32).toString('hex')
+export const randomString = () => randomBytes(32).toString('hex')
 
-const eventSource = url => {
+export type EventSourceHelper = {
+  nextEvent: () => Promise<any>,
+  all: () => Promise<any>,
+}
+
+export const eventSource = (
+  url: string
+): Promise<EventSourceHelper> => {
   const es = new EventSource(url)
-  const messageListeners = new Set()
   const watchedEvents = new Map()
 
   es.on('message', msg => {
-    for ([listener, remaining] of watchedEvents.entries()) {
+    for (let [listener, remaining] of watchedEvents.entries()) {
       listener(msg)
       if (remaining === 1) {
         watchedEvents.delete(listener)
@@ -102,28 +112,13 @@ const eventSource = url => {
   })
 }
 
-function* range (start, end) {
-  if (end === undefined) {
-    end = start
-    start = 0
-  }
+export function* range (startOrEnd: number, end?: number) {
+  const start = end === undefined ? 0 : startOrEnd
+  end = end === undefined ? startOrEnd : end
+
   for (let i = start; i < end; i++) {
     yield i
   }
 }
 
-const formatMicroseconds = n => `${(n | 0).toLocaleString()} μs`
-
-module.exports = {
-  sleep,
-  exec,
-  measure,
-  fetchUntilConnect,
-  randomString,
-  eventSource,
-  range,
-  formatMicroseconds,
-}
-
-
-
+export const formatMicroseconds = (n: number) => `${(n | 0).toLocaleString()} μs`

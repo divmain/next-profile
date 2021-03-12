@@ -2,21 +2,22 @@
   "compilerOptions": {
     "allowJs": false,
     "alwaysStrict": true,
+    "declaration": true,
+    "declarationDir": "dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "jsx": "preserve",
     "lib": [
       "dom",
       "DOM.Iterable",
       "es2017"
     ],
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "outDir": "dist",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
@@ -26,7 +27,7 @@
     "node_modules"
   ],
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ]
 }

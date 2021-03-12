@@ -1,22 +1,22 @@
 {
-  "name": "fefw-perf",
+  "name": "next-profile",
   "version": "1.0.0",
+  "bin": "./dist/next-profile.js",
   "scripts": {
-    "gen-components": "fuzzponent --depth 4 --seed 1337 --outdir components --minChild 2 --maxChild 5 --extension tsx",
-    "measure-next-hmr": "rm -fr .next && node harness/hmr-next.js",
-    "next-dev": "next",
-    "next-build": "next build",
-    "next-start": "next start",
-    "type-check": "tsc"
+    "build": "tsc"
   },
   "dependencies": {
     "cli-progress": "^3.9.0",
     "eventsource": "^1.0.7",
     "node-fetch": "^2.6.1",
-    "simple-statistics": "^7.6.0"
+    "simple-statistics": "^7.6.0",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
+    "@types/cli-progress": "^3.9.1",
     "@types/node": "^12.12.21",
+    "@types/node-fetch": "^2.5.8",
+    "@types/yargs": "^16.0.0",
     "typescript": "^4.1.2"
   },
   "peerDependencies": {
