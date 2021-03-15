@@ -11,8 +11,9 @@ export const sleep = promisify(setTimeout)
 const NANOSECONDS_IN_MICROSECOND = 1000n
 export const FETCH_LOOP_SLEEP = 20 // ms
 
-export const exec = (cmd: string) => {
+export const exec = (cmd: string, opts={}) => {
   const childProc = spawn(cmd, {
+    ...opts,
     shell: true,
     stdio: [
       0,
