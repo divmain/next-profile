@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "bin": "./dist/next-profile.js",
   "scripts": {
-    "build": "rm -fr dist && tsc"
+    "build": "rm -fr dist && tsc",
+    "prerelease": "yarn run build"
   },
   "dependencies": {
     "cli-progress": "^3.9.0",
