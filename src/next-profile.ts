@@ -81,6 +81,7 @@ const validateFile = async (filePath: string) => {
 
 const main = async () => {
   const argv: {
+    _: string[],
     page: string,
     file?: string,
     pageLoadIterations: number,
@@ -106,6 +107,7 @@ const main = async () => {
     .argv
 
   const {
+    _,
     page,
     file,
     pageLoadIterations,
@@ -114,6 +116,12 @@ const main = async () => {
     baseUrl,
     outfile,
   } = argv
+
+  if (!_ || !_.length || ['manual', 'auto'].indexOf(_[0]) === -1) {
+    console.log('Please provide a command. Run with --help to see options.')
+    process.exit(1)
+  }
+
 
   const pageRelUrl = parsePage(page)
   const fileToChange = file
@@ -135,7 +143,7 @@ const main = async () => {
 
   console.log(`writing measurements to file ${outfile}...`)
   const payload = JSON.stringify(measurements)
-  await writeFile(outfile, payload, 'utf8')
+  await writeFile(outfile, payload, 'utf8')  
 }
 
 main()
