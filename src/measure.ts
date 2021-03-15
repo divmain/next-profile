@@ -1,5 +1,6 @@
 import { promises as fsPromises } from 'fs'
 import cliProgress from 'cli-progress'
+import captureTrace from './capture-trace'
 const { readFile, writeFile } = fsPromises
 
 import {
@@ -178,10 +179,19 @@ const getMeasurements = async (
   pageRelUrl: string,
   pageLoadIterations: number,
   hmrIterations: number,
+  shouldCaptureTrace: boolean,
   fileToChange?: string,
 ) => {
+  let endCapture
+  let env = { ...process.env }
+  if (shouldCaptureTrace) {
+    endCapture = await captureTrace()
+    // Enable trace emit in Next.js.
+    env.TRACE_TARGET = 'ZIPKIN'
+  }
+
   console.log('starting next...')
-  const { sigint, onExit } = exec('node ./node_modules/.bin/next')
+  const { sigint, onExit } = exec('node ./node_modules/.bin/next', { env })
 
   const pageLoadMeasurements = await measurePageLoad(
     baseUrl,
@@ -201,6 +211,11 @@ const getMeasurements = async (
       hmrIterations,
     )
 
+  let trace
+  if (endCapture) {
+    await endCapture()
+  }
+
   console.log('terminating next...')
   const exit = onExit()
   sigint()
@@ -209,6 +224,7 @@ const getMeasurements = async (
   return {
     pageLoadMeasurements,
     hmrMeasurements,
+    trace,
   }
 }
 
