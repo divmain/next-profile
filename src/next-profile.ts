@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import path from 'path'
 import { promises as fsPromises } from 'fs'
 // @ts-ignore
@@ -23,7 +24,6 @@ const defineCommandOpts = ({
     yargs.option('file', {
       describe: 'the file that will be automatically edited to trigger an HMR',
       alias: 'f',
-      array: true,
       demandOption: true,
       normalize: true,
       type: 'string',
@@ -122,13 +122,12 @@ const main = async () => {
     process.exit(1)
   }
 
-
   const pageRelUrl = parsePage(page)
   const fileToChange = file
     ? path.resolve(process.cwd(), file)
     : undefined
 
-  if (fileToChange && !validateFile(fileToChange)) {
+  if (fileToChange && !(await validateFile(fileToChange))) {
     throw new Error(`File '${file}' does not exist or you don't have access.`)
   }
 

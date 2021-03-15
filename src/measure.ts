@@ -26,7 +26,7 @@ const prepForHmr = async (sourceFilePath: string) => {
   let injectStart = content.indexOf(INJECT_PRELUDE)
   let injectEnd = content.indexOf(INJECT_POSTLUDE) + INJECT_POSTLUDE.length
 
-  if (injectStart === 1) {
+  if (injectStart === -1) {
     injectStart = content.length
     injectEnd = content.length
   }
@@ -211,9 +211,9 @@ const getMeasurements = async (
       hmrIterations,
     )
 
-  let trace
+  let traces
   if (endCapture) {
-    await endCapture()
+    traces = await endCapture()
   }
 
   console.log('terminating next...')
@@ -224,7 +224,7 @@ const getMeasurements = async (
   return {
     pageLoadMeasurements,
     hmrMeasurements,
-    trace,
+    traces,
   }
 }
 
