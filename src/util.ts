@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto'
 import { promisify } from 'util'
 import { spawn } from 'child_process'
+import resolve from 'resolve'
 
 import EventSource from 'eventsource'
 import fetch, { Response, RequestInfo, RequestInit } from 'node-fetch'
@@ -123,3 +124,9 @@ export function* range (startOrEnd: number, end?: number) {
 }
 
 export const formatMicroseconds = (n: number) => `${(n | 0).toLocaleString()} μs`
+
+export const getNextPath = () => new Promise((_resolve, reject) => {
+  resolve('next/dist/bin/next', { basedir: process.cwd() }, (err, res) =>
+    err ? reject(err) : _resolve(res)
+  )
+})

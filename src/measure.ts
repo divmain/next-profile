@@ -11,6 +11,7 @@ import {
   randomString,
   eventSource,
   EventSourceHelper,
+  getNextPath,
 } from './util'
 
 
@@ -194,7 +195,8 @@ const getMeasurements = async (
   }
 
   console.log('starting next...')
-  const { sigint, onExit } = exec('node ./node_modules/.bin/next', { env })
+  const nextPath = await getNextPath()
+  const { sigint, onExit } = exec(`node ${nextPath}`, { env })
 
   const pageLoadMeasurements = await measurePageLoad(
     baseUrl,
