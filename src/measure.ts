@@ -71,7 +71,7 @@ const measurePageLoad = async (
   }, cliProgress.Presets.shades_classic);
   progressBar.start(iterations, 0);
 
-  for (let iteration = 1; iteration < iterations; iteration++) {
+  for (let iteration = 0; iteration < iterations; iteration++) {
     progressBar.update(iteration)
     const measurePageLoad = measure()
     const first = await fetchUntilConnect(pageUrl)
@@ -86,6 +86,7 @@ const measurePageLoad = async (
 
     await sleep(PAUSE_DURATION)
   }
+  progressBar.update(iterations)
 
   return pageLoadMeasurements
 }
@@ -107,7 +108,7 @@ const measureHmr = async (
   }, cliProgress.Presets.shades_classic);
   progressBar.start(iterations, 0);
 
-  for (let iteration = 1; iteration < iterations; iteration++) {
+  for (let iteration = 0; iteration < iterations; iteration++) {
     progressBar.update(iteration)
     const triggerHmr = await prepForHmr(fileToChange)
 
@@ -126,6 +127,7 @@ const measureHmr = async (
       hmrComplete,
     })
   }
+  progressBar.update(iterations)
 
   progressBar.stop()
 
@@ -154,7 +156,7 @@ const measureHmrManual = async (
   }, cliProgress.Presets.shades_classic);
   progressBar.start(iterations, 0);
 
-  for (let iteration = 1; iteration < iterations; iteration++) {
+  for (let iteration = 0; iteration < iterations; iteration++) {
     progressBar.update(iteration)
 
     await eventOfType(hmrSse, 'building')
@@ -168,6 +170,7 @@ const measureHmrManual = async (
       hmrComplete,
     })
   }
+  progressBar.update(iterations)
 
   progressBar.stop()
 
