@@ -198,11 +198,13 @@ const getMeasurements = async (
   const nextPath = await getNextPath()
   const { sigint, onExit } = exec(`node ${nextPath}`, { env })
 
+  console.log('measuring page load...')
   const pageLoadMeasurements = await measurePageLoad(
     baseUrl,
     pageRelUrl,
     pageLoadIterations,
   )
+  console.log('\nmeasuring hot module reload...')
   const hmrMeasurements = fileToChange
     ? await measureHmr(
       baseUrl,
