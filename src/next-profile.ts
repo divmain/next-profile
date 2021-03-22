@@ -157,7 +157,7 @@ const main = async () => {
     )
     .argv
 
-  const command = argv?._?.[0]
+  const command = argv._ && argv._.length && argv._[0]
   if (command === 'manual' || command === 'auto') {
     await captureDev(argv)
   } else if (command === 'run-trace') {
