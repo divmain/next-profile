@@ -7,11 +7,12 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 import getMeasurements from './measure'
+import runTrace from './run-trace'
 
 const { stat, writeFile } = fsPromises
 
 
-const defineCommandOpts = ({
+const defineDevCommandOpts = ({
   demandFile
 }: {
   demandFile: boolean
@@ -79,35 +80,8 @@ const validateFile = async (filePath: string) => {
   }
 }
 
-const main = async () => {
-  const argv: {
-    _: string[],
-    page: string,
-    file?: string,
-    pageLoadIterations: number,
-    hmrIterations: number,
-    captureTrace: boolean,
-    baseUrl: string,
-    outfile: string,
-  } = yargs(hideBin(process.argv))
-    .command(
-      'auto [page]',
-      'Profile a Next.js page with automatic HMRs.',
-      defineCommandOpts({
-        demandFile: true
-      })
-    )
-    .command(
-      'manual [page]',
-      'Profile a Next.js page with manual HMRs.',
-      defineCommandOpts({
-        demandFile: false
-      })
-    )
-    .argv
-
+const captureDev = async (argv: any) => {
   const {
-    _,
     page,
     file,
     pageLoadIterations,
@@ -116,11 +90,6 @@ const main = async () => {
     baseUrl,
     outfile,
   } = argv
-
-  if (!_ || !_.length || ['manual', 'auto'].indexOf(_[0]) === -1) {
-    console.log('Please provide a command. Run with --help to see options.')
-    process.exit(1)
-  }
 
   const pageRelUrl = parsePage(page)
   const fileToChange = file
@@ -143,6 +112,60 @@ const main = async () => {
   console.log(`writing measurements to file ${outfile}...`)
   const payload = JSON.stringify(measurements)
   await writeFile(outfile, payload, 'utf8')  
+}
+
+const main = async () => {
+  const argv: {
+    _: string[],
+    page: string,
+    file?: string,
+    pageLoadIterations: number,
+    hmrIterations: number,
+    captureTrace: boolean,
+    baseUrl: string,
+    outfile: string,
+  } = yargs(hideBin(process.argv))
+    .command(
+      'auto [page]',
+      'Profile a Next.js page with automatic HMRs.',
+      defineDevCommandOpts({
+        demandFile: true
+      }),
+    )
+    .command(
+      'manual [page]',
+      'Profile a Next.js page with manual HMRs.',
+      defineDevCommandOpts({
+        demandFile: false
+      }),
+    )
+    .command(
+      'run-trace [command]',
+      'Run a command and capture any telemetry.',
+      (yargs: any) => {
+        yargs.positional('command', {
+          describe: 'command to run',
+          type: 'string',
+        })
+        yargs.option('outfile', {
+          alias: 'o',
+          default: path.resolve(process.cwd(), `${Date.now()}.next-profile.json`),
+          type: 'string',
+          normalize: true,
+        })
+      },
+    )
+    .argv
+
+  const command = argv?._?.[0]
+  if (command === 'manual' || command === 'auto') {
+    await captureDev(argv)
+  } else if (command === 'run-trace') {
+    await runTrace(argv)
+  } else {
+    console.log('Please provide a command. Run with --help to see options.')
+    process.exit(1)
+  }
 }
 
 main()

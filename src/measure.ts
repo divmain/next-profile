@@ -1,8 +1,8 @@
 import { promises as fsPromises } from 'fs'
 import cliProgress from 'cli-progress'
-import captureTrace from './capture-trace'
 const { readFile, writeFile } = fsPromises
 
+import captureTrace from './capture-trace'
 import {
   sleep,
   exec,
