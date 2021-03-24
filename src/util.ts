@@ -16,12 +16,9 @@ export const exec = (cmd: string, opts={}) => {
   const childProc = spawn(cmd, {
     ...opts,
     shell: true,
-    stdio: [
-      0,
-      'pipe',
-      'pipe'
-    ],
   })
+  childProc.stdout.pipe(process.stdout)
+  childProc.stderr.pipe(process.stderr)
   const sigint = () => childProc.kill('SIGINT')
   const onExit = () => new Promise(resolve => childProc.on('exit', resolve))
 
